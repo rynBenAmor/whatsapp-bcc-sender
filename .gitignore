@@ -1,0 +1,7 @@
+.vscode/
+.test/
+.bin/
+__pycache__/
+venv/
+
+PyWhatKit_DB.txt
