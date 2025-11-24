@@ -6,5 +6,7 @@ if not exist venv (
 ) else (
     call venv\Scripts\activate
 )
+
 python main.py
-pause
+
+exist /b
