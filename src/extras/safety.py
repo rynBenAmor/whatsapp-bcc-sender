@@ -2,6 +2,9 @@ import os
 import importlib.util
 import webbrowser
 from typing import Union, Optional
+import re
+import time
+import random
 # ? ==================== end of imports ======================================================
 
 
@@ -47,7 +50,7 @@ def attach_exists() -> bool:
 
 
 
-# * safety parsers
+# * safety parsers and utils
 def read_file_safe(
         file_path: str,
         mode: str = "r",
@@ -81,3 +84,35 @@ def read_file_safe(
         return default
 
 
+def validate_phone_number(phone: str) -> Optional[str]:
+    """
+    Validates and formats a phone number.
+    Removes spaces, dashes, parentheses.
+    Ensures it starts with +.
+    """
+    # Remove non-numeric characters except +
+    clean_phone = re.sub(r'[^\d+]', '', phone)
+    
+    if not clean_phone:
+        return None
+    
+    if not clean_phone.startswith('+'):
+        # default to Tunisia prefix
+        clean_phone = "+216" + clean_phone
+
+    if len(clean_phone) < 8: # Arbitrary min length for intl number
+        return None
+        
+    return clean_phone
+
+
+def validate_file_path(path: str) -> bool:
+    """Checks if a file exists and is a file."""
+    return os.path.isfile(path)
+
+
+def random_sleep(min_seconds: int = 2, max_seconds: int = 5):
+    """Sleeps for a random amount of time to mimic human behavior."""
+    sleep_time = random.uniform(min_seconds, max_seconds)
+    print(f"Sleeping for {sleep_time:.2f} seconds...")
+    time.sleep(sleep_time)
