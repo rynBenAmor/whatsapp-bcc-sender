@@ -8,4 +8,4 @@ I need a way to send WhatsApp messages in a **blind carbon copy (BCC)** style si
 
 * PyWhatKit : simple automation for WhatsApp Web based on PyAutoGUI (not selenium)
 * **PyAutoGUI (custom scripts)** : added an extra module to full fill my automation needs
-* **Wrapper Layer** : lightweight abstraction to tie everything together and simulate BCC-style messaging and maybe a standalone execution
+* **Wrapper Layer** : lightweight abstraction to tie everything together and simulate BCC-style messaging in a CLI and maybe a standalone executable file
