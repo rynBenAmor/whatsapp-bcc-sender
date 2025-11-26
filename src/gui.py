@@ -8,7 +8,7 @@ import queue
 # We need to add the parent directory to sys.path to import from main
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.core import send_simple_message, send_image, send_pdf
-from src.extras.safety import validate_phone_number, validate_file_path
+from src.extras.safety import validate_phone_number, validate_file_path, read_file_safe
 
 class WhatsAppSenderGUI:
     def __init__(self, root):
@@ -38,45 +38,53 @@ class WhatsAppSenderGUI:
         tab = ttk.Frame(self.notebook)
         self.notebook.add(tab, text="Simple Message")
 
-        # Phone Numbers
-        lbl_phone = ttk.Label(tab, text="Phone Numbers (one per line):")
-        lbl_phone.pack(anchor='w', padx=5, pady=5)
-        
-        self.txt_phone_msg = scrolledtext.ScrolledText(tab, height=5)
-        self.txt_phone_msg.pack(fill='x', padx=5, pady=5)
+        # Phone numbers frame with browse button
+        frame_phone = ttk.LabelFrame(tab, text="Phone Numbers", padding=10)
+        frame_phone.pack(fill='x', padx=10, pady=10)
 
-        # Message
-        lbl_msg = ttk.Label(tab, text="Message:")
-        lbl_msg.pack(anchor='w', padx=5, pady=5)
-        
-        self.txt_msg_content = scrolledtext.ScrolledText(tab, height=5)
-        self.txt_msg_content.pack(fill='x', padx=5, pady=5)
+        btn_browse_msg = ttk.Button(
+            frame_phone,
+            text="Load from File",
+            command=lambda: self.load_phone_numbers_from_file(self.txt_phone_msg)
+        )
+        btn_browse_msg.pack(side='top', anchor='e', pady=(0, 5))
 
-        # Send Button
-        btn_send = ttk.Button(tab, text="Send Message", command=self.on_send_message)
-        btn_send.pack(pady=10)
+        self.txt_phone_msg = scrolledtext.ScrolledText(frame_phone, height=4, width=50)
+        self.txt_phone_msg.pack(fill='both', expand=True)
+
+        # Message content
+        ttk.Label(tab, text="Message:").pack(anchor='w', padx=10, pady=(10, 0))
+        self.txt_msg_content = scrolledtext.ScrolledText(tab, height=6)
+        self.txt_msg_content.pack(fill='both', expand=True, padx=10, pady=10)
+
+        # Send button
+        btn_send_msg = ttk.Button(tab, text="Send Message", command=self.on_send_message)
+        btn_send_msg.pack(pady=10)
 
     def create_image_tab(self):
         tab = ttk.Frame(self.notebook)
-        self.notebook.add(tab, text="Send Image")
+        self.notebook.add(tab, text="Image")
 
-        # Phone Numbers
-        lbl_phone = ttk.Label(tab, text="Phone Numbers (one per line):")
-        lbl_phone.pack(anchor='w', padx=5, pady=5)
-        
-        self.txt_phone_img = scrolledtext.ScrolledText(tab, height=5)
-        self.txt_phone_img.pack(fill='x', padx=5, pady=5)
+        # Phone numbers frame with browse button
+        frame_phone = ttk.LabelFrame(tab, text="Phone Numbers", padding=10)
+        frame_phone.pack(fill='x', padx=10, pady=10)
 
-        # Image File Selection
+        btn_browse_img = ttk.Button(
+            frame_phone,
+            text="Load from File",
+            command=lambda: self.load_phone_numbers_from_file(self.txt_phone_img)
+        )
+        btn_browse_img.pack(side='top', anchor='e', pady=(0, 5))
+
+        self.txt_phone_img = scrolledtext.ScrolledText(frame_phone, height=4, width=50)
+        self.txt_phone_img.pack(fill='both', expand=True)
+
+        # Image file
         frame_file = ttk.Frame(tab)
-        frame_file.pack(fill='x', padx=5, pady=5)
-        
-        lbl_file = ttk.Label(frame_file, text="Image File:")
-        lbl_file.pack(side='left')
-        
+        frame_file.pack(fill='x', padx=10, pady=10)
+        ttk.Label(frame_file, text="Image:").pack(side='left')
         self.entry_img_path = ttk.Entry(frame_file)
         self.entry_img_path.pack(side='left', fill='x', expand=True, padx=5)
-        
         btn_browse = ttk.Button(
             frame_file,
             text="Browse",
@@ -85,37 +93,38 @@ class WhatsAppSenderGUI:
         btn_browse.pack(side='left')
 
         # Caption
-        lbl_cap = ttk.Label(tab, text="Caption:")
-        lbl_cap.pack(anchor='w', padx=5, pady=5)
-        
-        self.txt_caption_img = scrolledtext.ScrolledText(tab, height=3)
-        self.txt_caption_img.pack(fill='x', padx=5, pady=5)
+        ttk.Label(tab, text="Caption:").pack(anchor='w', padx=10, pady=(10, 0))
+        self.txt_caption_img = scrolledtext.ScrolledText(tab, height=4)
+        self.txt_caption_img.pack(fill='both', expand=True, padx=10, pady=10)
 
-        # Send Button
-        btn_send = ttk.Button(tab, text="Send Image", command=self.on_send_image)
-        btn_send.pack(pady=10)
+        # Send button
+        btn_send_img = ttk.Button(tab, text="Send Image", command=self.on_send_image)
+        btn_send_img.pack(pady=10)
 
     def create_pdf_tab(self):
         tab = ttk.Frame(self.notebook)
-        self.notebook.add(tab, text="Send PDF")
+        self.notebook.add(tab, text="PDF")
 
-        # Phone Numbers
-        lbl_phone = ttk.Label(tab, text="Phone Numbers (one per line):")
-        lbl_phone.pack(anchor='w', padx=5, pady=5)
-        
-        self.txt_phone_pdf = scrolledtext.ScrolledText(tab, height=5)
-        self.txt_phone_pdf.pack(fill='x', padx=5, pady=5)
+        # Phone numbers frame with browse button
+        frame_phone = ttk.LabelFrame(tab, text="Phone Numbers", padding=10)
+        frame_phone.pack(fill='x', padx=10, pady=10)
 
-        # PDF File Selection
+        btn_browse_pdf = ttk.Button(
+            frame_phone,
+            text="Load from File",
+            command=lambda: self.load_phone_numbers_from_file(self.txt_phone_pdf)
+        )
+        btn_browse_pdf.pack(side='top', anchor='e', pady=(0, 5))
+
+        self.txt_phone_pdf = scrolledtext.ScrolledText(frame_phone, height=4, width=50)
+        self.txt_phone_pdf.pack(fill='both', expand=True)
+
+        # PDF file
         frame_file = ttk.Frame(tab)
-        frame_file.pack(fill='x', padx=5, pady=5)
-        
-        lbl_file = ttk.Label(frame_file, text="PDF File:")
-        lbl_file.pack(side='left')
-        
+        frame_file.pack(fill='x', padx=10, pady=10)
+        ttk.Label(frame_file, text="PDF:").pack(side='left')
         self.entry_pdf_path = ttk.Entry(frame_file)
         self.entry_pdf_path.pack(side='left', fill='x', expand=True, padx=5)
-        
         btn_browse = ttk.Button(
             frame_file,
             text="Browse",
@@ -124,15 +133,13 @@ class WhatsAppSenderGUI:
         btn_browse.pack(side='left')
 
         # Caption
-        lbl_cap = ttk.Label(tab, text="Caption:")
-        lbl_cap.pack(anchor='w', padx=5, pady=5)
-        
-        self.txt_caption_pdf = scrolledtext.ScrolledText(tab, height=3)
-        self.txt_caption_pdf.pack(fill='x', padx=5, pady=5)
+        ttk.Label(tab, text="Caption:").pack(anchor='w', padx=10, pady=(10, 0))
+        self.txt_caption_pdf = scrolledtext.ScrolledText(tab, height=4)
+        self.txt_caption_pdf.pack(fill='both', expand=True, padx=10, pady=10)
 
-        # Send Button
-        btn_send = ttk.Button(tab, text="Send PDF", command=self.on_send_pdf)
-        btn_send.pack(pady=10)
+        # Send button
+        btn_send_pdf = ttk.Button(tab, text="Send PDF", command=self.on_send_pdf)
+        btn_send_pdf.pack(pady=10)
 
     def create_log_area(self):
         lbl_log = ttk.Label(self.root, text="Logs:")
@@ -190,17 +197,43 @@ class WhatsAppSenderGUI:
             entry_widget.insert(0, filename)
 
     def get_valid_numbers(self, text_widget):
-        raw_text = text_widget.get("1.0", tk.END)
+        """Parse phone numbers from text widget. Supports pasted numbers or file path."""
+        raw_text = text_widget.get("1.0", tk.END).strip()
+        
+        # If text looks like a file path, try to read it
+        if raw_text.endswith('.txt') and os.path.exists(raw_text):
+            try:
+                raw_text = read_file_safe(raw_text, default="")
+            except Exception as e:
+                print(f"Warning: Could not read file '{raw_text}': {e}")
+                return []
+        
         valid_numbers = []
         for line in raw_text.split('\n'):
             line = line.strip()
-            if not line: continue
+            if not line or line.startswith('#'):  # skip empty lines and comments
+                continue
             valid_ph = validate_phone_number(line)
             if valid_ph:
                 valid_numbers.append(valid_ph)
             else:
-                print(f"Skipping invalid number: {line}")
+                print(f"Skipped invalid phone number: {line}")
+        
         return valid_numbers
+
+    def load_phone_numbers_from_file(self, text_widget):
+        """Browse and load phone numbers from a .txt file."""
+        filename = filedialog.askopenfilename(
+            filetypes=[("Text Files", ("*.txt",)), ("All Files", ("*",))]
+        )
+        if filename:
+            try:
+                content = read_file_safe(filename, default="")
+                text_widget.delete("1.0", tk.END)
+                text_widget.insert("1.0", content)
+                print(f"Loaded phone numbers from: {filename}")
+            except Exception as e:
+                messagebox.showerror("Error", f"Could not load file: {e}")
 
     def run_in_thread(self, target):
         thread = threading.Thread(target=target)

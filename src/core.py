@@ -6,7 +6,7 @@ from .extras.settings import WHATS_MAX_CAPTION, WHATS_MAX_MESSAGE, WAIT_TIME, TA
 
 
 def get_phone_numbers():
-    content = read_file_safe("attach/phone_numbers.txt", default="")
+    content = read_file_safe("attach/phone_numbers.txt")
     if not content:
         print("Error: No phone numbers found in attach/phone_numbers.txt")
         return []
@@ -25,11 +25,12 @@ def get_phone_numbers():
 
 
 def get_message(cap = WHATS_MAX_MESSAGE):
-    msg = read_file_safe("attach/message.txt", default="")
+    msg = read_file_safe("attach/message.txt")
     if not msg:
         print("No message found in attach/message.txt")
         return ""
     return msg.strip()[:cap] # max cap of a regular message
+
 
 def send_simple_message(phone_numbers=None, message=None):
     if phone_numbers is None:
