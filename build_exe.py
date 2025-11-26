@@ -15,6 +15,11 @@ def build():
         
         # Add data files
         '--add-data=src/extras/identifiers;src/extras/identifiers',
+        
+        '--upx-dir=upx',  # compression
+        
+        # Strip binary (removes debug symbols)
+        '--strip',
     ]
 
     # * CLI or GUI(preferred)
