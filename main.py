@@ -1,6 +1,6 @@
 import sys
 from src.extras.safety import is_installed, webbrowser_exists, attach_exists
-from src.gui import run_gui
+#from src.gui import run_gui
 from src.core import send_simple_message, send_image, send_pdf
 # ? ==================== end of imports ======================================================
 
@@ -25,10 +25,12 @@ def check_system():
 
 def main():
     try:
+        """         
         mode = input("Select mode: (1) CLI, (2) GUI: ").strip()
-        if mode == "2":
-            run_gui()
-            return
+                if mode == "2":
+                    run_gui()
+                    return 
+        """
 
         while True:
             print_menu()

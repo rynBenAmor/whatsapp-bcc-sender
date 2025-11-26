@@ -2,11 +2,13 @@ import pywhatkit.whats as pwk
 from .extras.pdf import sendwhatspdf
 from .extras.safety import read_file_safe, validate_phone_number, validate_file_path, random_sleep
 from .extras.settings import WHATS_MAX_CAPTION, WHATS_MAX_MESSAGE, WAIT_TIME, TAB_CLOSE
+from .extras.utils import BASE_DIR
+import os
 
 
 
 def get_phone_numbers():
-    content = read_file_safe("attach/phone_numbers.txt")
+    content = read_file_safe(os.path.join(BASE_DIR, "attach", "phone_numbers.txt"))
     if not content:
         print("Error: No phone numbers found in attach/phone_numbers.txt")
         return []
@@ -25,7 +27,7 @@ def get_phone_numbers():
 
 
 def get_message(cap = WHATS_MAX_MESSAGE):
-    msg = read_file_safe("attach/message.txt")
+    msg = read_file_safe(os.path.join(BASE_DIR, "attach", "message.txt"))
     if not msg:
         print("No message found in attach/message.txt")
         return ""
@@ -63,7 +65,8 @@ def send_image(phone_numbers=None, img_path=None, caption=None):
         return
     
     if img_path is None:
-        img_path = input("Enter image path (default: attach/images/sample.jpg): ").strip() or "attach/images/sample.jpg"
+        default_path = os.path.join(BASE_DIR, "attach", "images", "sample.jpg")
+        img_path = input(f"Enter image path (default: {default_path}): ").strip() or default_path
     
     if not validate_file_path(img_path):
         print(f"Error: Image file not found at {img_path}")
@@ -93,7 +96,8 @@ def send_pdf(phone_numbers=None, pdf_path=None, caption=None):
         return
 
     if pdf_path is None:
-        pdf_path = input("Enter PDF path (default: attach/pdf/sample.pdf): ").strip() or "attach/pdf/sample.pdf"
+        default_path = os.path.join(BASE_DIR, "attach", "pdf", "sample.pdf")
+        pdf_path = input(f"Enter PDF path (default: {default_path}): ").strip() or default_path
     
     if not validate_file_path(pdf_path):
         print(f"Error: PDF file not found at {pdf_path}")

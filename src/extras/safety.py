@@ -9,6 +9,8 @@ import random
 
 
 
+from .utils import BASE_DIR
+
 # * startup checkers
 def is_installed(package_name):
     return importlib.util.find_spec(package_name) is not None
@@ -25,7 +27,7 @@ def webbrowser_exists()-> bool:
 
 
 def attach_exists() -> bool:
-    folder_name = "attach"
+    folder_name = os.path.join(BASE_DIR, "attach")
     if not os.path.exists(folder_name):
         print(f"Warning: '{folder_name}' folder not found.")
         return False

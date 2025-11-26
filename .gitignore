@@ -3,5 +3,7 @@
 .bin/
 __pycache__/
 venv/
-
+dist/
+build/
+*.spec
 PyWhatKit_DB.txt
